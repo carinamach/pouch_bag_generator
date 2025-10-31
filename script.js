@@ -11,11 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const fabricHeightEl = document.getElementById('fabricHeight');
   const copyBtn = document.getElementById('copyBtn');
 
-  function showError(msg){
+  function showError(msg) {
     alert(msg);
   }
 
-  function fmt(n){
+  function fmt(n) {
     // trim unnecessary decimals
     if (Number.isInteger(n)) return n.toString();
     return parseFloat(n.toFixed(2)).toString();
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return valueCm;
   };
 
-  function buildConversions(cmValue){
+  function buildConversions(cmValue) {
     // return HTML with other unit conversions
     const mm = fromCm(cmValue, 'mm');
     const cm = fromCm(cmValue, 'cm');
@@ -43,13 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<p>Konverteringar: ${fmt(cm)} cm — ${fmt(mm)} mm — ${fmt(inch)} in</p>`;
   }
 
-  function renderDiagram(fabricWcm, fabricHcm){
+  function renderDiagram(fabricWcm, fabricHcm) {
     // Use a slightly larger canvas so labels/arrows won't be clipped.
     // The SVG viewBox is 0..240 (set in index.html) so we use canvasSize = 240
     const canvasSize = 240;
     const padding = 24; // leave room for arrows/labels
     const svg = document.getElementById('diagram');
-    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
 
     const w = fabricWcm;
     const h = fabricHcm;
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // label for width
     const labelW = document.createElementNS(ns, 'text');
     labelW.setAttribute('x', offsetX + drawW / 2);
-    labelW.setAttribute('y', arrowY + 6);
+    labelW.setAttribute('y', arrowY + 12);
     labelW.setAttribute('text-anchor', 'middle');
     labelW.setAttribute('class', 'diag-label');
     labelW.textContent = `${fmt(w)} cm`;
@@ -155,18 +155,18 @@ document.addEventListener('DOMContentLoaded', () => {
     svg.appendChild(labelH);
   }
 
-  function calculate(){
+  function calculate() {
     const unit = unitSelect.value;
     const w = parseFloat(desiredWidth.value);
     const h = parseFloat(desiredHeight.value);
     const d = parseFloat(desiredDepth.value);
     const s = parseFloat(seamAllowance.value);
 
-    if (Number.isNaN(w) || Number.isNaN(h) || Number.isNaN(d) || Number.isNaN(s)){
+    if (Number.isNaN(w) || Number.isNaN(h) || Number.isNaN(d) || Number.isNaN(s)) {
       showError('Vänligen fyll i alla fält med numeriska värden.');
       return;
     }
-    if (w < 0 || h < 0 || d < 0 || s < 0){
+    if (w < 0 || h < 0 || d < 0 || s < 0) {
       showError('Måtten kan inte vara negativa.');
       return;
     }
@@ -213,11 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   copyBtn.addEventListener('click', async () => {
     const text = `Tygbredd: ${fabricWidthEl.textContent} — Tyghöjd: ${fabricHeightEl.textContent} (konverteringar: ${conversions.textContent})`;
-    try{
+    try {
       await navigator.clipboard.writeText(text);
       copyBtn.textContent = 'Kopierat!';
-      setTimeout(()=> copyBtn.textContent = 'Kopiera resultat', 1500);
-    }catch(e){
+      setTimeout(() => copyBtn.textContent = 'Kopiera resultat', 1500);
+    } catch (e) {
       alert('Kunde inte kopiera automatiskt. Markera och kopiera manuellt: ' + text);
     }
   });
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const svg = document.getElementById('diagram');
     const serializer = new XMLSerializer();
     const source = serializer.serializeToString(svg);
-    const blob = new Blob([source], {type: 'image/svg+xml;charset=utf-8'});
+    const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
