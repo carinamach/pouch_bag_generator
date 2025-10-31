@@ -16,4 +16,11 @@ button{background:var(--accent);color:white;padding:8px 12px;border:0;border-rad
 button[type="reset"]{background:#6b7280}
 section{margin-top:18px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef2ff}
 .hidden{display:none}
+#diagramWrap{display:flex;justify-content:center;align-items:center;padding:8px}
+#diagram{width:100%;max-width:420px;height:auto;border:1px dashed #dbeafe;background:linear-gradient(180deg, rgba(13,110,253,0.02), transparent)}
+.result-actions{display:flex;gap:10px;margin-top:10px}
+
+/* labels inside diagram */
+.diag-label{font-size:10px;fill:#0f172a}
+
 @media (max-width:520px){.container{margin:12px;padding:14px}}

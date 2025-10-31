@@ -15,6 +15,11 @@ Instruktioner
 4. Klicka på "Beräkna tygmått" för att se rekommenderad tygstorlek.
 5. Använd "Kopiera resultat" för att kopiera beräkningen till urklipp.
 
+Stöd för enheter
+
+- Appen stödjer nu även inches (tums). Välj enhet i dropdown-listan.
+- Inmatade värden tolkas i den valda enheten. Resultatet visas i samma enhet och även som konverteringar till cm, mm och inches.
+
 Kommentarer
 
 - Sömsmånen i formuläret anges per sida. Formeln multiplicerar sömsmånen med 2 (för båda kanter).
@@ -26,3 +31,7 @@ Om du vill ha en färdig pouch med bredd 20 cm, höjd 12 cm och djup 4 cm, och a
 
 - bredd på tyg = 20 + 4 + 2×1 = 26 cm
 - höjd på tyg = 2×12 + 4 + 2×1 = 30 cm
+
+Diagram
+
+- Appen genererar ett enkelt SVG-diagram som visar den rekommenderade tygbiten (mått i cm i diagrammet). Du kan ladda ner diagrammet som en SVG-fil via knappen "Ladda ner diagram (SVG)".
