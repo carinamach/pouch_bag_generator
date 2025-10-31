@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="sv">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Beräkna tyg för pouch med dragkedja</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <main class="container">
     <h1>Tygberäknare för pouch (med dragkedja)</h1>
@@ -45,12 +47,15 @@
 
     <section id="results" aria-live="polite" class="hidden">
       <h2>Rekommenderad tygstorlek</h2>
-      <p id="formula">Formler: bredd = önskad bredd + önskad djup + 2 × sömsmån; höjd = 2 × önskad höjd + önskad djup + 2 × sömsmån</p>
+      <p id="formula">Formler:</p>
+      <p class="formula">bredd = önskad bredd + önskad djup + 2 × sömsmån; </p>
+      <p class="formula">höjd = 2 × önskad höjd + önskad djup + 2 × sömsmån</p>
 
       <h3>Mellanresultat</h3>
       <ul>
         <li>Total sömsmån (båda sidor): <strong id="totalSeam"></strong></li>
-        <li>Indata (valda enheter): bredd <span id="inWidth"></span>, höjd <span id="inHeight"></span>, djup <span id="inDepth"></span>, sömsmån per sida <span id="inSeam"></span></li>
+        <li>Indata (valda enheter): bredd <span id="inWidth"></span>, höjd <span id="inHeight"></span>, djup <span
+            id="inDepth"></span>, sömsmån per sida <span id="inSeam"></span></li>
       </ul>
 
       <h3>Resultat</h3>
@@ -79,4 +84,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>
