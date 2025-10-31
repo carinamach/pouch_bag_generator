@@ -53,14 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const w = fabricWcm;
     const h = fabricHcm;
-    const drawArea = canvasSize - padding * 2; // space for the rectangle
+    const drawArea = canvasSize - padding * 3; // space for the rectangle
     // scale to fit into drawArea while keeping aspect ratio
     const scale = Math.max(w / drawArea, h / drawArea, 1e-6);
     const drawW = w / scale;
     const drawH = h / scale;
 
-    const offsetX = padding + (drawArea - drawW) / 2;
-    const offsetY = padding + (drawArea - drawH) / 2;
+    const offsetX = padding + (drawArea - drawW) + 15 / 2;
+    const offsetY = padding + (drawArea - drawH)  / 2;
 
     const ns = 'http://www.w3.org/2000/svg';
     // background rect
