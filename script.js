@@ -44,23 +44,35 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDiagram(fabricWcm, fabricHcm){
-    // diagram size in px fixed viewBox 200x200, we map fabric ratio into it
+    // Use a slightly larger canvas so labels/arrows won't be clipped.
+    // The SVG viewBox is 0..240 (set in index.html) so we use canvasSize = 240
+    const canvasSize = 240;
+    const padding = 24; // leave room for arrows/labels
     const svg = document.getElementById('diagram');
     while(svg.firstChild) svg.removeChild(svg.firstChild);
 
-    const maxBox = 180; // leave margin
-    const margin = 10;
     const w = fabricWcm;
     const h = fabricHcm;
-    // maintain ratio
-    const scale = Math.max(w / maxBox, h / maxBox);
-    const drawW = (scale > 0) ? Math.min(maxBox, w / scale) : maxBox;
-    const drawH = (scale > 0) ? Math.min(maxBox, h / scale) : maxBox;
-    const offsetX = (200 - drawW) / 2;
-    const offsetY = (200 - drawH) / 2;
+    const drawArea = canvasSize - padding * 2; // space for the rectangle
+    // scale to fit into drawArea while keeping aspect ratio
+    const scale = Math.max(w / drawArea, h / drawArea, 1e-6);
+    const drawW = w / scale;
+    const drawH = h / scale;
+
+    const offsetX = padding + (drawArea - drawW) / 2;
+    const offsetY = padding + (drawArea - drawH) / 2;
+
+    const ns = 'http://www.w3.org/2000/svg';
+    // background rect
+    const bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('x', 0);
+    bg.setAttribute('y', 0);
+    bg.setAttribute('width', canvasSize);
+    bg.setAttribute('height', canvasSize);
+    bg.setAttribute('fill', 'none');
+    svg.appendChild(bg);
 
     // outer rect (fabric)
-    const ns = 'http://www.w3.org/2000/svg';
     const rect = document.createElementNS(ns, 'rect');
     rect.setAttribute('x', offsetX);
     rect.setAttribute('y', offsetY);
@@ -71,22 +83,18 @@ document.addEventListener('DOMContentLoaded', () => {
     rect.setAttribute('stroke-width', '1');
     svg.appendChild(rect);
 
-    // width arrow
-    const arrowY = offsetY + drawH + 14;
+    // width arrow (below the rectangle)
+    const arrowY = offsetY + drawH + 12;
     const lineW = document.createElementNS(ns, 'line');
     lineW.setAttribute('x1', offsetX);
     lineW.setAttribute('y1', arrowY);
     lineW.setAttribute('x2', offsetX + drawW);
     lineW.setAttribute('y2', arrowY);
     lineW.setAttribute('stroke', '#0f172a');
+    lineW.setAttribute('stroke-width', '1');
     svg.appendChild(lineW);
-    const leftArrow = document.createElementNS(ns, 'text');
-    leftArrow.setAttribute('x', offsetX);
-    leftArrow.setAttribute('y', arrowY + 10);
-    leftArrow.setAttribute('class', 'diag-label');
-    leftArrow.textContent = '';
-    svg.appendChild(leftArrow);
 
+    // label for width
     const labelW = document.createElementNS(ns, 'text');
     labelW.setAttribute('x', offsetX + drawW / 2);
     labelW.setAttribute('y', arrowY + 6);
@@ -95,18 +103,51 @@ document.addEventListener('DOMContentLoaded', () => {
     labelW.textContent = `${fmt(w)} cm`;
     svg.appendChild(labelW);
 
-    // height arrow
-    const arrowX = offsetX - 14;
+    // little end markers for width
+    const capLeft = document.createElementNS(ns, 'line');
+    capLeft.setAttribute('x1', offsetX);
+    capLeft.setAttribute('y1', arrowY - 4);
+    capLeft.setAttribute('x2', offsetX);
+    capLeft.setAttribute('y2', arrowY + 4);
+    capLeft.setAttribute('stroke', '#0f172a');
+    svg.appendChild(capLeft);
+    const capRight = document.createElementNS(ns, 'line');
+    capRight.setAttribute('x1', offsetX + drawW);
+    capRight.setAttribute('y1', arrowY - 4);
+    capRight.setAttribute('x2', offsetX + drawW);
+    capRight.setAttribute('y2', arrowY + 4);
+    capRight.setAttribute('stroke', '#0f172a');
+    svg.appendChild(capRight);
+
+    // height arrow (left side)
+    const arrowX = offsetX - 12;
     const lineH = document.createElementNS(ns, 'line');
     lineH.setAttribute('x1', arrowX);
     lineH.setAttribute('y1', offsetY);
     lineH.setAttribute('x2', arrowX);
     lineH.setAttribute('y2', offsetY + drawH);
     lineH.setAttribute('stroke', '#0f172a');
+    lineH.setAttribute('stroke-width', '1');
     svg.appendChild(lineH);
 
+    // height caps
+    const capTop = document.createElementNS(ns, 'line');
+    capTop.setAttribute('x1', arrowX - 4);
+    capTop.setAttribute('y1', offsetY);
+    capTop.setAttribute('x2', arrowX + 4);
+    capTop.setAttribute('y2', offsetY);
+    capTop.setAttribute('stroke', '#0f172a');
+    svg.appendChild(capTop);
+    const capBottom = document.createElementNS(ns, 'line');
+    capBottom.setAttribute('x1', arrowX - 4);
+    capBottom.setAttribute('y1', offsetY + drawH);
+    capBottom.setAttribute('x2', arrowX + 4);
+    capBottom.setAttribute('y2', offsetY + drawH);
+    capBottom.setAttribute('stroke', '#0f172a');
+    svg.appendChild(capBottom);
+
     const labelH = document.createElementNS(ns, 'text');
-    labelH.setAttribute('x', arrowX - 4);
+    labelH.setAttribute('x', arrowX - 6);
     labelH.setAttribute('y', offsetY + drawH / 2 + 4);
     labelH.setAttribute('text-anchor', 'end');
     labelH.setAttribute('class', 'diag-label');
