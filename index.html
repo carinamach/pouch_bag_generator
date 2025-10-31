@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Beräkna tyg för pouch med dragkedja</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Tygberäknare för pouch (med dragkedja)</h1>
+
+    <p>Fyll i önskade slutmått och sömsmån. Resultatet visar vilken storlek tygbiten bör ha.</p>
+
+    <form id="calcForm">
+      <label>Enhet
+        <select id="unit">
+          <option value="cm">cm</option>
+          <option value="mm">mm</option>
+        </select>
+      </label>
+
+      <label>Önskad bredd (slutmått)
+        <input id="desiredWidth" type="number" step="any" min="0" required />
+      </label>
+
+      <label>Önskad höjd (slutmått)
+        <input id="desiredHeight" type="number" step="any" min="0" required />
+      </label>
+
+      <label>Önskad djup (slutmått)
+        <input id="desiredDepth" type="number" step="any" min="0" required />
+      </label>
+
+      <label>Sömsmån (per sida)
+        <input id="seamAllowance" type="number" step="any" min="0" value="1" required />
+      </label>
+
+      <div class="buttons">
+        <button id="calculate" type="button">Beräkna tygmått</button>
+        <button id="reset" type="reset">Återställ</button>
+      </div>
+    </form>
+
+    <section id="results" aria-live="polite" class="hidden">
+      <h2>Rekommenderad tygstorlek</h2>
+      <p id="formula">Formler: bredd = önskad bredd + önskad djup + 2 × sömsmån; höjd = 2 × önskad höjd + önskad djup + 2 × sömsmån</p>
+      <ul>
+        <li>Bredd på tyg: <strong id="fabricWidth"></strong></li>
+        <li>Höjd på tyg: <strong id="fabricHeight"></strong></li>
+      </ul>
+      <button id="copyBtn" type="button">Kopiera resultat</button>
+    </section>
+
+    <footer>
+      <small>Made for sewing pouches — ange mått i valda enheter.</small>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
