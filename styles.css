@@ -105,7 +105,12 @@ section {
     font-size: 10px;
     fill: #0f172a
 }
-
+#imgPouch {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 20px;
+}
 @media (max-width:520px) {
     .container {
         margin: 12px;
