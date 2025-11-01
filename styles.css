@@ -1,8 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap');
+
 :root {
-    --bg: #f7f7fb;
+    --bg: #fff9f9;
     --card: #ffffff;
-    --accent: #1266f1;
-    --text: #111827;
+    /* Mörkare nyanser för bättre kontrast enligt WCAG AA */
+    --accent: #d84f63;
+    --accent-hover: #c73d51;
+    --text: #2d2426;
+    --text-secondary: #4a3d3f;
+    --border: #dec4c9;
+    --secondary: #2c8e82;
 }
 
 * {
@@ -10,19 +17,23 @@
 }
 
 body {
-    font-family: Segoe UI, Roboto, Arial, sans-serif;
+    font-family: 'Quicksand', system-ui, -apple-system, sans-serif;
     margin: 0;
     background: var(--bg);
     color: var(--text);
+    line-height: 1.8;
+    font-size: 16px;
+    font-weight: 400;
 }
 
 .container {
     max-width: 720px;
     margin: 32px auto;
-    padding: 20px;
+    padding: 24px;
     background: var(--card);
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06)
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(92, 75, 81, 0.08);
+    border: 2px solid var(--border)
 }
 
 h1 {
@@ -37,42 +48,70 @@ form {
 label {
     display: flex;
     flex-direction: column;
-    font-size: 0.95rem
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.5rem;
 }
 
 input,
 select {
-    padding: 8px 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 1rem
+    padding: 10px 12px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent);
 }
 
 .buttons {
     display: flex;
-    gap: 10px;
-    margin-top: 6px
+    gap: 12px;
+    margin-top: 12px
 }
 
 button {
     background: var(--accent);
     color: white;
-    padding: 8px 12px;
+    padding: 10px 16px;
     border: 0;
     border-radius: 8px;
-    cursor: pointer
+    cursor: pointer;
+    font-size: 1rem;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
 }
 
 button[type="reset"] {
-    background: #6b7280
+    background: var(--secondary)
 }
 
 section {
-    margin-top: 18px;
-    padding: 12px;
-    border-radius: 8px;
-    background: #fbfdff;
-    border: 1px solid #eef2ff
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 10px;
+    background: white;
+    border: 2px solid var(--border);
+    position: relative;
+}
+
+section::before {
+    content: '🧵';
+    position: absolute;
+    top: -12px;
+    left: 16px;
+    font-size: 1.2rem;
+    background: white;
+    padding: 0 8px;
 }
 
 .hidden {
@@ -83,15 +122,18 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 8px
+    padding: 16px;
+    margin: 16px 0;
 }
 
 #diagram {
     width: 100%;
     max-width: 420px;
     height: auto;
-    border: 1px dashed #dbeafe;
-    background: linear-gradient(180deg, rgba(13, 110, 253, 0.02), transparent)
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(249, 166, 179, 0.04), transparent);
+    padding: 12px;
 }
 
 .result-actions {
@@ -102,14 +144,46 @@ section {
 
 /* labels inside diagram */
 .diag-label {
-    font-size: 10px;
-    fill: #0f172a
+    font-size: 12px;
+    fill: var(--text);
+    font-family: 'Quicksand', system-ui, -apple-system, sans-serif;
+    font-weight: 500;
 }
+
 #imgPouch {
     max-width: 100%;
     height: auto;
     display: block;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+}
+
+/* Dekorativa element */
+label::before {
+    content: '✄';
+    color: var(--accent);
+    margin-right: 8px;
+}
+
+h1 {
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    font-weight: 600;
+    font-size: 2.25rem;
+    letter-spacing: -0.02em;
+}
+
+h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    margin: 12px auto 0;
+    border-radius: 2px;
 }
 @media (max-width:520px) {
     .container {
