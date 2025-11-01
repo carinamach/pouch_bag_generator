@@ -43,117 +43,173 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<p>Konverteringar: ${fmt(cm)} cm — ${fmt(mm)} mm — ${fmt(inch)} in</p>`;
   }
 
-  function renderDiagram(fabricWcm, fabricHcm) {
-    // Use a slightly larger canvas so labels/arrows won't be clipped.
-    // The SVG viewBox is 0..240 (set in index.html) so we use canvasSize = 240
-    const canvasSize = 240;
-    const padding = 24; // leave room for arrows/labels
-    const svg = document.getElementById('diagram');
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
+function renderDiagram(fabricWcm, fabricHcm, dCm, sCm) {
+  const canvasSize = 260;
+  const padding = 24;
+  const svg = document.getElementById('diagram');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-    const w = fabricWcm;
-    const h = fabricHcm;
-    const drawArea = canvasSize - padding * 3; // space for the rectangle
-    // scale to fit into drawArea while keeping aspect ratio
-    const scale = Math.max(w / drawArea, h / drawArea, 1e-6);
-    const drawW = w / scale;
-    const drawH = h / scale;
+  const w = fabricWcm;
+  const h = fabricHcm;
+  const corner = dCm / 2 + sCm; // hur mycket man ska klippa bort (cm)
+  const drawArea = canvasSize - padding * 3;
+  const scale = Math.max(w / drawArea, h / drawArea, 1e-6);
+  const drawW = w / scale;
+  const drawH = h / scale;
+  const cornerDraw = corner / scale;
+  const offsetX = padding + (drawArea - drawW) / 2;
+  const offsetY = padding + (drawArea - drawH) / 2;
+  const ns = 'http://www.w3.org/2000/svg';
 
-    const offsetX = padding + (drawArea - drawW) + 15 / 2;
-    const offsetY = padding + (drawArea - drawH)  / 2;
+  // pilmarkörer
+  const defs = document.createElementNS(ns, 'defs');
+  const marker = document.createElementNS(ns, 'marker');
+  marker.setAttribute('id', 'arrow');
+  marker.setAttribute('viewBox', '0 0 10 10');
+  marker.setAttribute('refX', '5');
+  marker.setAttribute('refY', '5');
+  marker.setAttribute('markerWidth', '5');
+  marker.setAttribute('markerHeight', '5');
+  marker.setAttribute('orient', 'auto-start-reverse');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+  path.setAttribute('fill', '#000');
+  marker.appendChild(path);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
 
-    const ns = 'http://www.w3.org/2000/svg';
-    // background rect
-    const bg = document.createElementNS(ns, 'rect');
-    bg.setAttribute('x', 0);
-    bg.setAttribute('y', 0);
-    bg.setAttribute('width', canvasSize);
-    bg.setAttribute('height', canvasSize);
-    bg.setAttribute('fill', 'none');
-    svg.appendChild(bg);
+  // ytterrektangel
+  const rect = document.createElementNS(ns, 'rect');
+  rect.setAttribute('x', offsetX);
+  rect.setAttribute('y', offsetY);
+  rect.setAttribute('width', drawW);
+  rect.setAttribute('height', drawH);
+  rect.setAttribute('fill', '#ffffff');
+  rect.setAttribute('stroke', '#0f172a');
+  rect.setAttribute('stroke-width', '1');
+  svg.appendChild(rect);
 
-    // outer rect (fabric)
-    const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', offsetX);
-    rect.setAttribute('y', offsetY);
-    rect.setAttribute('width', drawW);
-    rect.setAttribute('height', drawH);
-    rect.setAttribute('fill', '#ffffff');
-    rect.setAttribute('stroke', '#0f172a');
-    rect.setAttribute('stroke-width', '1');
-    svg.appendChild(rect);
+  // mittlinje
+  const midY = offsetY + drawH / 2;
+  const midLine = document.createElementNS(ns, 'line');
+  midLine.setAttribute('x1', offsetX);
+  midLine.setAttribute('y1', midY);
+  midLine.setAttribute('x2', offsetX + drawW);
+  midLine.setAttribute('y2', midY);
+  midLine.setAttribute('stroke', '#888');
+  midLine.setAttribute('stroke-width', '0.6');
+  midLine.setAttribute('stroke-dasharray', '4,2');
+  svg.appendChild(midLine);
 
-    // width arrow (below the rectangle)
-    const arrowY = offsetY + drawH + 12;
-    const lineW = document.createElementNS(ns, 'line');
-    lineW.setAttribute('x1', offsetX);
-    lineW.setAttribute('y1', arrowY);
-    lineW.setAttribute('x2', offsetX + drawW);
-    lineW.setAttribute('y2', arrowY);
-    lineW.setAttribute('stroke', '#0f172a');
-    lineW.setAttribute('stroke-width', '1');
-    svg.appendChild(lineW);
+  // hörnklipp (4)
+  const corners = [
+    [offsetX, offsetY, 0, -4],
+    [offsetX + drawW - cornerDraw, offsetY, 4, -4],
+    [offsetX, offsetY + drawH - cornerDraw, 0, 12],
+    [offsetX + drawW - cornerDraw, offsetY + drawH - cornerDraw, 4, 12]
+  ];
+  corners.forEach(([x, y, tx, ty]) => {
+    const cut = document.createElementNS(ns, 'rect');
+    cut.setAttribute('x', x);
+    cut.setAttribute('y', y);
+    cut.setAttribute('width', cornerDraw);
+    cut.setAttribute('height', cornerDraw);
+    cut.setAttribute('fill', 'none');
+    cut.setAttribute('stroke', '#000');
+    cut.setAttribute('stroke-dasharray', '3,2');
+    svg.appendChild(cut);
 
-    // label for width
-    const labelW = document.createElementNS(ns, 'text');
-    labelW.setAttribute('x', offsetX + drawW / 2);
-    labelW.setAttribute('y', arrowY + 12);
-    labelW.setAttribute('text-anchor', 'middle');
-    labelW.setAttribute('class', 'diag-label');
-    labelW.textContent = `${fmt(w)} cm`;
-    svg.appendChild(labelW);
+    // text som visar måttet
+    const label = document.createElementNS(ns, 'text');
+    label.setAttribute('x', x + cornerDraw / 2 + tx);
+    label.setAttribute('y', y + cornerDraw / 2 + ty);
+    label.setAttribute('font-size', '7');
+    label.setAttribute('text-anchor',  'middle');
+    label.textContent = `${fmt(corner)} cm`;
+    svg.appendChild(label);
+  });
 
-    // little end markers for width
-    const capLeft = document.createElementNS(ns, 'line');
-    capLeft.setAttribute('x1', offsetX);
-    capLeft.setAttribute('y1', arrowY - 4);
-    capLeft.setAttribute('x2', offsetX);
-    capLeft.setAttribute('y2', arrowY + 4);
-    capLeft.setAttribute('stroke', '#0f172a');
-    svg.appendChild(capLeft);
-    const capRight = document.createElementNS(ns, 'line');
-    capRight.setAttribute('x1', offsetX + drawW);
-    capRight.setAttribute('y1', arrowY - 4);
-    capRight.setAttribute('x2', offsetX + drawW);
-    capRight.setAttribute('y2', arrowY + 4);
-    capRight.setAttribute('stroke', '#0f172a');
-    svg.appendChild(capRight);
+  const sideCuts = [
+  [offsetX, midY - cornerDraw, 0, -1],     // vänster
+  [offsetX + drawW - cornerDraw, midY - cornerDraw, cornerDraw + 4, 0] // höger
+];
 
-    // height arrow (left side)
-    const arrowX = offsetX - 12;
-    const lineH = document.createElementNS(ns, 'line');
-    lineH.setAttribute('x1', arrowX);
-    lineH.setAttribute('y1', offsetY);
-    lineH.setAttribute('x2', arrowX);
-    lineH.setAttribute('y2', offsetY + drawH);
-    lineH.setAttribute('stroke', '#0f172a');
-    lineH.setAttribute('stroke-width', '1');
-    svg.appendChild(lineH);
+sideCuts.forEach(([x, y, tx, ty], i) => {
+  const cut = document.createElementNS(ns, 'rect');
+  cut.setAttribute('x', x);
+  cut.setAttribute('y', y);
+  cut.setAttribute('width', cornerDraw);
+  cut.setAttribute('height', 2 * cornerDraw);
+  cut.setAttribute('fill', 'none');
+  cut.setAttribute('stroke', '#000');
+  cut.setAttribute('stroke-dasharray', '3,2');
+  svg.appendChild(cut);
 
-    // height caps
-    const capTop = document.createElementNS(ns, 'line');
-    capTop.setAttribute('x1', arrowX - 4);
-    capTop.setAttribute('y1', offsetY);
-    capTop.setAttribute('x2', arrowX + 4);
-    capTop.setAttribute('y2', offsetY);
-    capTop.setAttribute('stroke', '#0f172a');
-    svg.appendChild(capTop);
-    const capBottom = document.createElementNS(ns, 'line');
-    capBottom.setAttribute('x1', arrowX - 4);
-    capBottom.setAttribute('y1', offsetY + drawH);
-    capBottom.setAttribute('x2', arrowX + 4);
-    capBottom.setAttribute('y2', offsetY + drawH);
-    capBottom.setAttribute('stroke', '#0f172a');
-    svg.appendChild(capBottom);
+  // Text som visar hur mycket som klipps bort i bredd (d/2 + s)
+  const label = document.createElementNS(ns, 'text');
+  label.setAttribute('x', x + cornerDraw / 2);
+  label.setAttribute('y', y - 4);
+  label.setAttribute('font-size', '7');
+  label.setAttribute('text-anchor', 'middle');
+  label.textContent = `${fmt(corner)} cm`;
+  svg.appendChild(label);
 
-    const labelH = document.createElementNS(ns, 'text');
-    labelH.setAttribute('x', arrowX - 6);
-    labelH.setAttribute('y', offsetY + drawH / 2 + 4);
-    labelH.setAttribute('text-anchor', 'end');
-    labelH.setAttribute('class', 'diag-label');
-    labelH.textContent = `${fmt(h)} cm`;
-    svg.appendChild(labelH);
-  }
+  // Text som visar hela höjden på klippet (d + 2s)
+  const cutHeight = dCm + 2 * sCm;
+  const heightLabel = document.createElementNS(ns, 'text');
+  heightLabel.setAttribute('x', x + (i === 0 ? 30 : cornerDraw - 30)); // vänster längre ut, höger innanför
+  heightLabel.setAttribute('y', y + cornerDraw); // centrera vertikalt på rektangeln
+  heightLabel.setAttribute('font-size', '7');
+  heightLabel.setAttribute('text-anchor', i === 0 ? 'end' : 'start');
+  heightLabel.textContent = `${fmt(cutHeight)} cm`;
+  svg.appendChild(heightLabel);
+});
+
+
+  // måttpil - bredd
+  const arrowY = offsetY + drawH + 12;
+  const arrowLine = document.createElementNS(ns, 'line');
+  arrowLine.setAttribute('x1', offsetX);
+  arrowLine.setAttribute('y1', arrowY);
+  arrowLine.setAttribute('x2', offsetX + drawW);
+  arrowLine.setAttribute('y2', arrowY);
+  arrowLine.setAttribute('stroke', '#000');
+  arrowLine.setAttribute('marker-start', 'url(#arrow)');
+  arrowLine.setAttribute('marker-end', 'url(#arrow)');
+  svg.appendChild(arrowLine);
+
+  const widthText = document.createElementNS(ns, 'text');
+  widthText.setAttribute('x', offsetX + drawW / 2);
+  widthText.setAttribute('y', arrowY + 10);
+  widthText.setAttribute('text-anchor', 'middle');
+  widthText.setAttribute('font-size', '7');
+  widthText.textContent = `${fmt(w)} cm`;
+  svg.appendChild(widthText);
+
+  // måttpil - höjd
+  const arrowX = offsetX - 8;
+  const arrowLineVert = document.createElementNS(ns, 'line');
+  arrowLineVert.setAttribute('x1', arrowX);
+  arrowLineVert.setAttribute('y1', offsetY);
+  arrowLineVert.setAttribute('x2', arrowX);
+  arrowLineVert.setAttribute('y2', offsetY + drawH);
+  arrowLineVert.setAttribute('stroke', '#000');
+  arrowLineVert.setAttribute('marker-start', 'url(#arrow)');
+  arrowLineVert.setAttribute('marker-end', 'url(#arrow)');
+  svg.appendChild(arrowLineVert);
+
+  const heightText = document.createElementNS(ns, 'text');
+  heightText.setAttribute('x', arrowX - 2);
+  heightText.setAttribute('y', offsetY + drawH / 2 + 3);
+  heightText.setAttribute('text-anchor', 'end');
+  heightText.setAttribute('font-size', '7');
+  heightText.textContent = ` ${fmt(h)} cm`;
+  svg.appendChild(heightText);
+}
+
+ 
+
+
 
   function calculate() {
     const unit = unitSelect.value;
@@ -204,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
     // Render simple diagram using cm values
-    renderDiagram(fabricWidthCm, fabricHeightCm);
+    renderDiagram(fabricWidthCm, fabricHeightCm, dCm, sCm);
 
     results.classList.remove('hidden');
   }
@@ -222,21 +278,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // download svg button
-  const downloadSvg = document.getElementById('downloadSvg');
-  downloadSvg.addEventListener('click', () => {
-    const svg = document.getElementById('diagram');
-    const serializer = new XMLSerializer();
-    const source = serializer.serializeToString(svg);
-    const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'pouch_diagram.svg';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  });
 
 });
